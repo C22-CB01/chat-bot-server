@@ -1,0 +1,10 @@
+{"level":"info","timestamp":"2022-06-04T21:32:28+07:00","method":"GET","path":"/favicon.ico","duration":"8.989µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:32:33+07:00","method":"GET","path":"/index.html","duration":"5.082µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:46:14+07:00","method":"GET","path":"/","duration":"5.438µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:59:14+07:00","method":"GET","path":"/api/","duration":"4.369µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:59:14+07:00","method":"GET","path":"/favicon.ico","duration":"3.771µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:59:17+07:00","method":"GET","path":"/api/chat","duration":"96.59µs","status":200}
+{"level":"info","timestamp":"2022-06-04T21:59:57+07:00","method":"GET","path":"/docs","duration":"6.575µs","status":200}
+{"level":"info","timestamp":"2022-06-04T22:00:00+07:00","method":"GET","path":"/docs/index.html","duration":"9.396µs","status":200}
+{"level":"info","timestamp":"2022-06-04T22:07:02+07:00","method":"GET","path":"/api/chat","duration":"37.847µs","status":200}
+{"level":"info","timestamp":"2022-06-04T22:07:20+07:00","method":"GET","path":"/api/chat","duration":"15.976µs","status":200}

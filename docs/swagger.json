@@ -1,0 +1,34 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/chat": {
+            "get": {
+                "description": "Endpoint for testing by returning Hello World",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "/chat"
+                ],
+                "summary": "Testing Endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}

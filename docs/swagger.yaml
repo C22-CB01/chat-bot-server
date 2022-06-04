@@ -1,0 +1,21 @@
+info:
+  contact: {}
+paths:
+  /api/chat:
+    get:
+      description: Endpoint for testing by returning Hello World
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: ""
+        "500":
+          description: ""
+      summary: Testing Endpoint
+      tags:
+      - /chat
+swagger: "2.0"
