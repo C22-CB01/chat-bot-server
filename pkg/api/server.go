@@ -5,6 +5,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/c22-cb01/chat-bot-server/docs"
 	"go.uber.org/zap"
@@ -15,15 +16,17 @@ import (
 type Server struct {
 	Router      *fiber.App
 	FirebaseApp *firebase.App
+    FirebaseAuth *auth.Client
 	Firestore   *firestore.Client
 }
 
-func MakeServer(firebase_app *firebase.App, firestore *firestore.Client) Server {
+func MakeServer(firebase_app *firebase.App, fire_auth *auth.Client, firestore *firestore.Client) Server {
 	r := fiber.New()
 	server := Server{
-		Router:      r,
-		FirebaseApp: firebase_app,
-		Firestore:   firestore,
+		Router:       r,
+		FirebaseApp:  firebase_app,
+		FirebaseAuth: fire_auth,
+		Firestore:    firestore,
 	}
 	return server
 }
