@@ -3,6 +3,7 @@ package chat
 import (
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
+	"google.golang.org/api/iterator"
 )
 
 type Handler struct {
@@ -50,6 +51,29 @@ func (h *Handler) CreateUserData(c *fiber.Ctx) error {
 	message, status, err := h.Service.CreateUserData(claims.(*auth.Token).UID)
 
 	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(status).JSON(fiber.Map{
+		"message": message,
+	})
+}
+
+// @Summary Set group for messages
+// @Description Endpoint for setting group to store messages
+// @Tags /chat/group
+// @Produce json
+// @Success 200 {object} string
+// @Failure 400 {object} string
+// @Failure 500 {object} string
+// @Router /api/chat/group [post]
+func (h *Handler) CreateGroup(c *fiber.Ctx) error {
+	claims := c.Locals("claims")
+	message, status, err := h.Service.CreateGroup(claims.(*auth.Token).UID)
+
+	if err != nil && err != iterator.Done {
 		return c.Status(status).JSON(fiber.Map{
 			"message": err.Error(),
 		})

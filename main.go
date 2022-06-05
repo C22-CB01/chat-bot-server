@@ -26,16 +26,16 @@ func main() {
 	if err != nil {
 		zap.L().Fatal("error initializing app: %v\n", zap.Error(err))
 	}
-	firestore, err := firebase_app.Firestore(ctx)
+	fire_store, err := firebase_app.Firestore(ctx)
 	if err != nil {
 		zap.L().Fatal("error initializing firestore: %v\n", zap.Error(err))
 	}
 
 
 	defer func() {
-		firestore.Close()
+		fire_store.Close()
 	}()
 
-	s := api.MakeServer(firebase_app, fire_auth, firestore)
+	s := api.MakeServer(firebase_app, fire_auth, fire_store)
 	s.RunServer()
 }

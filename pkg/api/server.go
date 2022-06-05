@@ -20,13 +20,13 @@ type Server struct {
 	Firestore   *firestore.Client
 }
 
-func MakeServer(firebase_app *firebase.App, fire_auth *auth.Client, firestore *firestore.Client) Server {
+func MakeServer(firebase_app *firebase.App, fire_auth *auth.Client, fire_store *firestore.Client) Server {
 	r := fiber.New()
 	server := Server{
 		Router:       r,
 		FirebaseApp:  firebase_app,
 		FirebaseAuth: fire_auth,
-		Firestore:    firestore,
+		Firestore:    fire_store,
 	}
 	return server
 }

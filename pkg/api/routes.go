@@ -20,5 +20,6 @@ func (s *Server) SetupRouter() {
 	s.Router.Use(recover.New())
 
 	chat.Post("/user", chatHandler.CreateUserData)
+	chat.Post("/group", chatHandler.CreateGroup)
 
 }
