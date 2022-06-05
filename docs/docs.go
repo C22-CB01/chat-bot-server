@@ -74,6 +74,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/chat/message": {
+            "post": {
+                "description": "Endpoint for sending messages according to group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "/chat/message"
+                ],
+                "summary": "Add message according to group",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/chat/user": {
             "post": {
                 "description": "Endpoint for setting user data",

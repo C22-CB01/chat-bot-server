@@ -19,6 +19,11 @@ type response_type struct {
 	Title  string `json:"title"`
 }
 
+type text_message struct {
+	Text     string `json:"text,omitempty"`
+	TextType string `json:"textType"`
+}
+
 func NewHandler(service Service) *Handler {
 	return &Handler{
 		Service: service,
@@ -89,6 +94,35 @@ func (h *Handler) CreateUserData(c *fiber.Ctx) error {
 func (h *Handler) CreateGroup(c *fiber.Ctx) error {
 	claims := c.Locals("claims")
 	message, status, err := h.Service.CreateGroup(claims.(*auth.Token).UID)
+
+	if err != nil && err != iterator.Done {
+		return c.Status(status).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(status).JSON(fiber.Map{
+		"message": message,
+	})
+}
+
+// @Summary Add message according to group
+// @Description Endpoint for sending messages according to group
+// @Tags /chat/message
+// @Produce json
+// @Success 200 {object} string
+// @Failure 400 {object} string
+// @Failure 500 {object} string
+// @Router /api/chat/message [post]
+func (h *Handler) CreateMessage(c *fiber.Ctx) error {
+	claims := c.Locals("claims")
+	payload := text_message{}
+	if err := c.BodyParser(&payload); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	message, status, err := h.Service.CreateMessage(claims.(*auth.Token).UID, payload.Text)
 
 	if err != nil && err != iterator.Done {
 		return c.Status(status).JSON(fiber.Map{

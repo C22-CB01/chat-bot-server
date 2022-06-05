@@ -14,6 +14,7 @@ type Service interface {
 	HelloWorld() (message string, status int, err error)
 	CreateUserData(uid string) (message string, status int, err error)
 	CreateGroup(uid string) (message string, status int, err error)
+	CreateMessage(uid string, text string) (message string, status int, err error)
 }
 
 type service struct {
@@ -36,7 +37,7 @@ type groups struct {
 }
 
 type messages struct {
-	GroupID     string    `firestore:"groupID,omitempty"`
+	SendBy      string    `firestore:"sendBy,omitempty"`
 	DateCreated time.Time `firestore:"dateCreated,serverTimestamp"`
 	Message     string    `firestore:"message,omitempty"`
 }
@@ -111,5 +112,39 @@ func (s *service) CreateGroup(uid string) (message string, status int, err error
 		return
 	}
 	message = "Group has already been created"
+	return
+}
+
+func (s *service) CreateMessage(uid string, text string) (message string, status int, err error) {
+	status = http.StatusOK
+	u, err := s.FirebaseAuth.GetUser(context.Background(), uid)
+	if err != nil {
+		message = "Cannot obtain user"
+		status = http.StatusInternalServerError
+	}
+
+	// get groupId
+	iter := s.Firestore.Collection("groups").Where("createdBy", "==", u.UID).Limit(1).Documents(context.Background())
+	doc, err := iter.Next()
+	if err != nil {
+		s.CreateGroup(uid)
+		return
+	}
+	groupUID := doc.Data()["uid"].(string)
+
+	text_message := messages{
+		SendBy:  u.UID,
+		Message: text,
+	}
+
+	_, _, err = s.Firestore.Collection("messages").Doc(groupUID).Collection("group_messages").Add(context.Background(), text_message)
+
+	if err != nil {
+		status = http.StatusInternalServerError
+		message = "Message failed to be sent"
+
+		return
+	}
+	message = "Message has been sent"
 	return
 }

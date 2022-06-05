@@ -22,5 +22,6 @@ func (s *Server) SetupRouter() {
 
 	chat.Post("/user", chatHandler.CreateUserData)
 	chat.Post("/group", chatHandler.CreateGroup)
+	chat.Post("/message", chatHandler.CreateMessage)
 
 }
