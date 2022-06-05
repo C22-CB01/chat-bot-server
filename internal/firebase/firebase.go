@@ -33,6 +33,9 @@ func MiddleWare(auth *auth.Client) func(c *fiber.Ctx) error {
 				"message": "Token is malformed",
 			})
 		}
+
+        c.Locals("claims", token)
+
 		return c.Next()
 	}
 }
