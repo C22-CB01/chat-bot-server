@@ -1,6 +1,9 @@
 package chat
 
 import (
+	"encoding/json"
+	"net/http"
+
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
 	"google.golang.org/api/iterator"
@@ -8,6 +11,12 @@ import (
 
 type Handler struct {
 	Service Service
+}
+
+type response_type struct {
+	UserId int    `json:"userId"`
+	Id     int    `json:"Id"`
+	Title  string `json:"title"`
 }
 
 func NewHandler(service Service) *Handler {
@@ -25,13 +34,21 @@ func NewHandler(service Service) *Handler {
 // @Failure 500
 // @Router /api/chat [get]
 func (h *Handler) HelloWorld(c *fiber.Ctx) error {
-	message, status, err := h.Service.HelloWorld()
+	// message, status, err := h.Service.HelloWorld()
+	resp, err := http.Get("https://jsonplaceholder.typicode.com/posts/1")
+	// body, err := ioutil.ReadAll(resp.Body)
+	var message response_type
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&message)
+	status := fiber.StatusOK
 
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
+
+	defer resp.Body.Close()
 
 	return c.Status(status).JSON(fiber.Map{
 		"message": message,
