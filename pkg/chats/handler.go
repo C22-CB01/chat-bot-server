@@ -1,8 +1,10 @@
 package chat
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
@@ -20,8 +22,8 @@ type response_type struct {
 }
 
 type text_message struct {
-	Text     string `json:"text,omitempty"`
-	TextType string `json:"textType"`
+	Text string `json:"message,omitempty"`
+	Tag  string `json:"tag"`
 }
 
 func NewHandler(service Service) *Handler {
@@ -40,9 +42,13 @@ func NewHandler(service Service) *Handler {
 // @Router /api/chat [get]
 func (h *Handler) HelloWorld(c *fiber.Ctx) error {
 	// message, status, err := h.Service.HelloWorld()
-	resp, err := http.Get("https://jsonplaceholder.typicode.com/posts/1")
-	// body, err := ioutil.ReadAll(resp.Body)
-	var message response_type
+	ml_server := os.Getenv("ML_SERVER_URL")
+	post_body, _ := json.Marshal(map[string]string{
+		"text": "Hello",
+	})
+    response_body := bytes.NewBuffer(post_body)
+	resp, err := http.Post(ml_server, "application/json", response_body)
+	var message text_message
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&message)
 	status := fiber.StatusOK
