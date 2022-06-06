@@ -13,8 +13,6 @@ RUN go mod tidy &&\
 FROM alpine:3.15
 WORKDIR /projects
 COPY --from=builder /build/main ./
-COPY .env .
-COPY firebase_key.json .
 EXPOSE 8000
 
 ENTRYPOINT [ "./main" ]
