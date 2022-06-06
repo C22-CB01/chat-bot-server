@@ -15,13 +15,7 @@ type Handler struct {
 	Service Service
 }
 
-type response_type struct {
-	UserId int    `json:"userId"`
-	Id     int    `json:"Id"`
-	Title  string `json:"title"`
-}
-
-type text_message struct {
+type Text_message struct {
 	Text string `json:"message,omitempty"`
 	Tag  string `json:"tag"`
 }
@@ -46,9 +40,9 @@ func (h *Handler) HelloWorld(c *fiber.Ctx) error {
 	post_body, _ := json.Marshal(map[string]string{
 		"text": "Hello",
 	})
-    response_body := bytes.NewBuffer(post_body)
+	response_body := bytes.NewBuffer(post_body)
 	resp, err := http.Post(ml_server, "application/json", response_body)
-	var message text_message
+	var message Text_message
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&message)
 	status := fiber.StatusOK
@@ -122,13 +116,26 @@ func (h *Handler) CreateGroup(c *fiber.Ctx) error {
 // @Router /api/chat/message [post]
 func (h *Handler) CreateMessage(c *fiber.Ctx) error {
 	claims := c.Locals("claims")
-	payload := text_message{}
+
+	// Send client user message
+	payload := Text_message{}
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-	message, status, err := h.Service.CreateMessage(claims.(*auth.Token).UID, payload.Text)
+	message, status, err, groupId := h.Service.CreateMessageUser(claims.(*auth.Token).UID, payload.Text)
+
+	if err != nil && err != iterator.Done {
+		return c.Status(status).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	// bot message
+	payload, status, err = h.Service.ProcessedML(payload.Text)
+
+	message, status, err = h.Service.CreateMessageBot(groupId, payload.Text)
 
 	if err != nil && err != iterator.Done {
 		return c.Status(status).JSON(fiber.Map{
@@ -138,5 +145,6 @@ func (h *Handler) CreateMessage(c *fiber.Ctx) error {
 
 	return c.Status(status).JSON(fiber.Map{
 		"message": message,
+		"payload": payload,
 	})
 }

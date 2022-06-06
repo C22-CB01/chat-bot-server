@@ -1,8 +1,11 @@
 package chat
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -14,7 +17,9 @@ type Service interface {
 	HelloWorld() (message string, status int, err error)
 	CreateUserData(uid string) (message string, status int, err error)
 	CreateGroup(uid string) (message string, status int, err error)
-	CreateMessage(uid string, text string) (message string, status int, err error)
+	CreateMessageUser(uid string, text string) (message string, status int, err error, groupId string)
+	CreateMessageBot(groupUID string, text string) (message string, status int, err error)
+	ProcessedML(text string) (response Text_message, status int, err error)
 }
 
 type service struct {
@@ -115,7 +120,7 @@ func (s *service) CreateGroup(uid string) (message string, status int, err error
 	return
 }
 
-func (s *service) CreateMessage(uid string, text string) (message string, status int, err error) {
+func (s *service) CreateMessageUser(uid string, text string) (message string, status int, err error, groupUID string) {
 	status = http.StatusOK
 	u, err := s.FirebaseAuth.GetUser(context.Background(), uid)
 	if err != nil {
@@ -130,10 +135,10 @@ func (s *service) CreateMessage(uid string, text string) (message string, status
 		s.CreateGroup(uid)
 		return
 	}
-	groupUID := doc.Data()["uid"].(string)
+	groupUID = doc.Data()["uid"].(string)
 
 	text_message := messages{
-		SendBy:  u.UID,
+		SendBy:  uid,
 		Message: text,
 	}
 
@@ -146,5 +151,38 @@ func (s *service) CreateMessage(uid string, text string) (message string, status
 		return
 	}
 	message = "Message has been sent"
+	return
+}
+
+func (s *service) CreateMessageBot(groupUID string, text string) (message string, status int, err error) {
+	status = http.StatusOK
+
+	text_message := messages{
+		SendBy:  "BOT",
+		Message: text,
+	}
+
+	_, _, err = s.Firestore.Collection("messages").Doc(groupUID).Collection("group_messages").Add(context.Background(), text_message)
+
+	if err != nil {
+		status = http.StatusInternalServerError
+		message = "Message failed to be sent"
+
+		return
+	}
+	message = "Message has been sent"
+	return
+}
+
+func (s *service) ProcessedML(text string) (ml_resp Text_message, status int, err error) {
+	status = http.StatusOK
+	ml_server := os.Getenv("ML_SERVER_URL")
+	post_body, _ := json.Marshal(map[string]string{
+		"text": text,
+	})
+	response_body := bytes.NewBuffer(post_body)
+	resp, err := http.Post(ml_server, "application/json", response_body)
+	decoder := json.NewDecoder(resp.Body)
+	err = decoder.Decode(&ml_resp)
 	return
 }
