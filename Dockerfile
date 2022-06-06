@@ -1,17 +1,20 @@
-FROM python:3.10.4-slim-buster
-ENV PYTHONBUFFERED=1
-
-RUN apt-get update && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pip install pipenv
-COPY Pipfile /app/
-
-WORKDIR /app
-
-RUN pipenv lock --keep-outdated --requirements > requirements.txt && \
-	pip install --no-cache-dir -r requirements.txt
+# Build stage
+FROM golang:1.18-alpine3.15 as builder
+WORKDIR /build
+COPY go.mod . 
+COPY go.sum .
+RUN go mod download
 
 COPY . .
+RUN go mod tidy &&\
+    go build -o main .
 
-CMD [ "python3", "-m" , "flask", "run"]
+# Run stage
+FROM alpine:3.15
+WORKDIR /projects
+COPY --from=builder /build/main ./
+COPY .env .
+COPY firebase_key.json .
+EXPOSE 8000
+
+ENTRYPOINT [ "./main" ]
