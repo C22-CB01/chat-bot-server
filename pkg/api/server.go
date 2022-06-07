@@ -14,10 +14,10 @@ import (
 )
 
 type Server struct {
-	Router      *fiber.App
-	FirebaseApp *firebase.App
-    FirebaseAuth *auth.Client
-	Firestore   *firestore.Client
+	Router       *fiber.App
+	FirebaseApp  *firebase.App
+	FirebaseAuth *auth.Client
+	Firestore    *firestore.Client
 }
 
 func MakeServer(firebase_app *firebase.App, fire_auth *auth.Client, fire_store *firestore.Client) Server {

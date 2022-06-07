@@ -1,2 +1,7 @@
+.air.toml
 Dockerfile
-logs
+firebase_key.json
+logs/
+playground.go
+test.http
+tmp/

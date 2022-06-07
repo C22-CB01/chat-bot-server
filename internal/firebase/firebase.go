@@ -34,7 +34,7 @@ func MiddleWare(auth *auth.Client) func(c *fiber.Ctx) error {
 			})
 		}
 
-        c.Locals("claims", token)
+		c.Locals("claims", token)
 
 		return c.Next()
 	}

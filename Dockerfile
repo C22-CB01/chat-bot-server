@@ -1,27 +1,26 @@
 # Build stage
-FROM golang:1.18-alpine3.15 as builder
-WORKDIR /build
+FROM golang:1.18 as builder
+WORKDIR /app
 
-COPY go.mod . 
-COPY go.sum .
+COPY go.* ./
 RUN go mod download
 
-COPY . .
-RUN go build -o main .
+COPY . ./
+RUN CGO_ENABLED=0 GOOS=linux go build -mod=readonly -v -o server
 
-# Run stage
-FROM alpine:3.15 as prod
-WORKDIR /projects
-COPY --from=builder /build/main ./
+FROM alpine:3 as prod
+RUN apk add --no-cache ca-certificates
+
+COPY --from=builder /app/server /server
 EXPOSE 8080
 
-CMD [ "./main" ]
+CMD [ "/server" ]
 
-FROM alpine:3.15 as dev
-WORKDIR /projects
-COPY --from=builder /build/main ./
+FROM alpine:3 as dev
+RUN apk add --no-cache ca-certificates
+
+COPY --from=builder /app/server /server
 EXPOSE 8080
-COPY .env .
-COPY firebase_key.json .
+COPY firebase_key.json ./
 
-CMD [ "./main" ]
+CMD [ "/server" ]
