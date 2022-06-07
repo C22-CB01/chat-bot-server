@@ -13,8 +13,9 @@ func (s *Server) SetupRouter() {
 	chatService := chat.NewService(s.FirebaseApp, s.FirebaseAuth, s.Firestore)
 	chatHandler := chat.NewHandler(chatService)
 
-    s.Router.Get("/", chatHandler.HelloWorld)
 	api := s.Router.Group("/api")
+	api.Get("/", chatHandler.HelloWorld)
+
 	chat := api.Group("/chat")
 	chat.Use(firebase.MiddleWare(s.FirebaseAuth))
 

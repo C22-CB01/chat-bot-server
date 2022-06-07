@@ -1,10 +1,7 @@
 package chat
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
-	"os"
 
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
@@ -36,27 +33,9 @@ func NewHandler(service Service) *Handler {
 // @Router /api/chat [get]
 func (h *Handler) HelloWorld(c *fiber.Ctx) error {
 	// message, status, err := h.Service.HelloWorld()
-	ml_server := os.Getenv("ML_SERVER_URL")
-	post_body, _ := json.Marshal(map[string]string{
-		"text": "Hello",
-	})
-	response_body := bytes.NewBuffer(post_body)
-	resp, err := http.Post(ml_server, "application/json", response_body)
-	var message Text_message
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(&message)
-	status := fiber.StatusOK
-
-	if err != nil {
-		return c.Status(status).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-
-	defer resp.Body.Close()
-
+	status := http.StatusOK
 	return c.Status(status).JSON(fiber.Map{
-		"message": message,
+		"message": "Hello World",
 	})
 }
 
