@@ -1,6 +1,5 @@
 .air.toml
 Dockerfile
-firebase_key.json
 logs/
 playground.go
 test.http
