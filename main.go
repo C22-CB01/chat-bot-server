@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"math/rand"
+	"os"
 	"time"
 
 	firebase "firebase.google.com/go"
@@ -10,6 +11,7 @@ import (
 	"gitlab.com/c22-cb01/chat-bot-server/internal/logger"
 	"gitlab.com/c22-cb01/chat-bot-server/pkg/api"
 	"go.uber.org/zap"
+	"google.golang.org/api/option"
 )
 
 func main() {
@@ -18,7 +20,9 @@ func main() {
 	logger.SetLogger()
 
 	ctx := context.Background()
-	firebase_app, err := firebase.NewApp(ctx, nil)
+	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CREDENTIAL_FILE"))
+
+	firebase_app, err := firebase.NewApp(ctx, nil, opt)
 	if err != nil {
 		zap.L().Fatal("error initializing app: %v\n", zap.Error(err))
 	}
@@ -30,7 +34,6 @@ func main() {
 	if err != nil {
 		zap.L().Fatal("error initializing firestore: %v\n", zap.Error(err))
 	}
-
 
 	defer func() {
 		fire_store.Close()

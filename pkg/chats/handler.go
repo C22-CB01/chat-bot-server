@@ -1,5 +1,7 @@
 package chat
 
+// TODO: Make response for places (get from ML server)
+
 import (
 	"net/http"
 
@@ -34,6 +36,7 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) HelloWorld(c *fiber.Ctx) error {
 	// message, status, err := h.Service.HelloWorld()
 	status := http.StatusOK
+
 	return c.Status(status).JSON(fiber.Map{
 		"message": "Hello World",
 	})
