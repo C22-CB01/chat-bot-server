@@ -2,5 +2,7 @@
 Dockerfile
 logs/
 playground.go
-test.http
+test_local.http
+test_cloud.http
 tmp/
+.env

@@ -1,3 +1,11 @@
+definitions:
+  chat.Text_message:
+    properties:
+      message:
+        type: string
+      tag:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -42,13 +50,19 @@ paths:
   /api/chat/message:
     post:
       description: Endpoint for sending messages according to group
+      parameters:
+      - description: Text tag
+        in: body
+        name: tag
+        schema:
+          type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/chat.Text_message'
         "400":
           description: Bad Request
           schema:

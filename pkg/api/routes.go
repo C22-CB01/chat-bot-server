@@ -9,17 +9,16 @@ import (
 
 func (s *Server) SetupRouter() {
 	s.Router.Use(logger.MiddleWare())
+	s.Router.Use(recover.New())
 
 	chatService := chat.NewService(s.FirebaseApp, s.FirebaseAuth, s.Firestore)
 	chatHandler := chat.NewHandler(chatService)
 
 	api := s.Router.Group("/api")
-	api.Get("/", chatHandler.HelloWorld)
+	api.Post("/", chatHandler.HelloWorld)
 
 	chat := api.Group("/chat")
 	chat.Use(firebase.MiddleWare(s.FirebaseAuth))
-
-	s.Router.Use(recover.New())
 
 	chat.Post("/user", chatHandler.CreateUserData)
 	chat.Post("/group", chatHandler.CreateGroup)

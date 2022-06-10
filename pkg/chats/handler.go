@@ -4,6 +4,7 @@ package chat
 
 import (
 	"net/http"
+	"os"
 
 	"firebase.google.com/go/auth"
 	"github.com/gofiber/fiber/v2"
@@ -92,7 +93,8 @@ func (h *Handler) CreateGroup(c *fiber.Ctx) error {
 // @Description Endpoint for sending messages according to group
 // @Tags /chat/message
 // @Produce json
-// @Success 200 {object} string
+// @Param tag body string false "Text tag"
+// @Success 200 {object} Text_message
 // @Failure 400 {object} string
 // @Failure 500 {object} string
 // @Router /api/chat/message [post]
@@ -115,7 +117,16 @@ func (h *Handler) CreateMessage(c *fiber.Ctx) error {
 	}
 
 	// bot message
-	payload, status, err = h.Service.ProcessedML(payload.Text)
+	ml_server := os.Getenv("ML_SERVER_URL")
+
+	// determined which response
+	switch payload.Tag {
+	case "restaurant_recommendation":
+		ml_server = ml_server + "/resto-recommendation"
+	case "hotel_recommendation":
+		ml_server = ml_server + "/hotel-recommendation"
+	}
+	payload, status, err = h.Service.ProcessedML(payload.Text, ml_server)
 
 	message, status, err = h.Service.CreateMessageBot(groupId, payload.Text)
 

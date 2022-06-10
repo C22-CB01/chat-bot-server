@@ -84,11 +84,21 @@ const docTemplate = `{
                     "/chat/message"
                 ],
                 "summary": "Add message according to group",
+                "parameters": [
+                    {
+                        "description": "Text tag",
+                        "name": "tag",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.Text_message"
                         }
                     },
                     "400": {
@@ -135,6 +145,19 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "chat.Text_message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
                 }
             }
         }

@@ -10,7 +10,7 @@ import (
 	"gitlab.com/c22-cb01/chat-bot-server/docs"
 	"go.uber.org/zap"
 
-	fiberSwagger "github.com/swaggo/fiber-swagger"
+	fiberSwagger "github.com/gofiber/swagger"
 )
 
 type Server struct {
@@ -50,5 +50,5 @@ func (s *Server) SetupSwagger() {
 	docs.SwaggerInfo.Host = os.Getenv("SWAGGER_HOST")
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	s.Router.Get("/swagger/*", fiberSwagger.WrapHandler)
+	s.Router.Get("/swagger/*", fiberSwagger.HandlerDefault)
 }
