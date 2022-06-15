@@ -45,10 +45,10 @@ func (s *Server) RunServer() {
 func (s *Server) SetupSwagger() {
 
 	docs.SwaggerInfo.Title = "Swagger API"
-	docs.SwaggerInfo.Description = "Chat-bot server"
+	docs.SwaggerInfo.Description = "A server responsible for delivering messages to the ML API"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = os.Getenv("SWAGGER_HOST")
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	s.Router.Get("/swagger/*", fiberSwagger.HandlerDefault)
+	s.Router.Get("/docs/*", fiberSwagger.HandlerDefault)
 }

@@ -14,6 +14,10 @@ import (
 	"google.golang.org/api/option"
 )
 
+// @BasePath  /api/
+// @securityDefinitions.apiKey JWT
+// @in header
+// @name Authorization
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	godotenv.Load()
