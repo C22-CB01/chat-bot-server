@@ -1,0 +1,8 @@
+.air.toml
+Dockerfile
+logs/
+playground.go
+test_local.http
+test_cloud.http
+tmp/
+.env

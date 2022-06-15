@@ -1,8 +1,22 @@
+basePath: /api/
+definitions:
+  chat.Text_message:
+    properties:
+      message:
+        type: string
+      tag:
+        type: string
+    type: object
+  chat.response_message:
+    properties:
+      message:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /api/chat:
-    get:
+  /:
+    post:
       description: Endpoint for testing by returning Hello World
       produces:
       - application/json
@@ -10,15 +24,19 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "400":
-          description: ""
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/chat.response_message'
         "500":
-          description: ""
-      summary: Testing Endpoint
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/chat.response_message'
+      summary: Testing Server
       tags:
-      - /chat
-  /api/chat/group:
+      - Test
+  /chat/group:
     post:
       description: Endpoint for setting group to store messages
       produces:
@@ -27,40 +45,53 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
+      security:
+      - JWT: []
       summary: Set group for messages
       tags:
-      - /chat/group
-  /api/chat/message:
+      - Group
+  /chat/message:
     post:
+      consumes:
+      - application/json
       description: Endpoint for sending messages according to group
+      parameters:
+      - description: Text tag
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/chat.Text_message'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/chat.Text_message'
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
+      security:
+      - JWT: []
       summary: Add message according to group
       tags:
-      - /chat/message
-  /api/chat/user:
+      - Message
+  /chat/user:
     post:
       description: Endpoint for setting user data
       produces:
@@ -69,16 +100,23 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/chat.response_message'
+      security:
+      - JWT: []
       summary: Set user data for messages
       tags:
-      - /chat/user
+      - User
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

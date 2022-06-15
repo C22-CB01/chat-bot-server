@@ -1,20 +1,15 @@
 # Build stage
-FROM golang:1.18-alpine3.15 as builder
+FROM golang:1.18-alpine3.15 AS builder
 WORKDIR /build
-COPY go.mod . 
-COPY go.sum .
-RUN go mod download
-
 COPY . .
-RUN go mod tidy &&\
-    go build -o main .
+RUN go mod tidy
+RUN go build -o main ./cmd/chat-bot/main.go
 
 # Run stage
 FROM alpine:3.15
-WORKDIR /projects
-COPY --from=builder /build/main ./
-COPY .env .
-COPY firebase_key.json .
-EXPOSE 8000
+WORKDIR /app
+COPY --from=builder /build/main .
+# COPY firebase_key.json .
 
-ENTRYPOINT [ "./main" ]
+EXPOSE 8080
+CMD [ "/app/main" ]

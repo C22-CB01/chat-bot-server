@@ -1,8 +1,8 @@
 package chat
 
+// TODO: Make response for places (get from ML server)
+
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
 	"os"
 
@@ -20,54 +20,42 @@ type Text_message struct {
 	Tag  string `json:"tag"`
 }
 
+type response_message struct {
+	Message string `json:"message,omitempty"`
+}
+
 func NewHandler(service Service) *Handler {
 	return &Handler{
 		Service: service,
 	}
 }
 
-// @Summary Testing Endpoint
-// @Description Endpoint for testing by returning Hello World
-// @Tags /chat
-// @Produce json
-// @Success 200 {object} string
-// @Failure 400
-// @Failure 500
-// @Router /api/chat [get]
+// @Summary      Testing Server
+// @Description  Endpoint for testing by returning Hello World
+// @Tags         Test
+// @Produce      json
+// @Success      200  {object}  response_message
+// @Failure      400  {object}  response_message
+// @Failure      500  {object}  response_message
+// @Router       / [post]
 func (h *Handler) HelloWorld(c *fiber.Ctx) error {
 	// message, status, err := h.Service.HelloWorld()
-	ml_server := os.Getenv("ML_SERVER_URL")
-	post_body, _ := json.Marshal(map[string]string{
-		"text": "Hello",
-	})
-	response_body := bytes.NewBuffer(post_body)
-	resp, err := http.Post(ml_server, "application/json", response_body)
-	var message Text_message
-	decoder := json.NewDecoder(resp.Body)
-	err = decoder.Decode(&message)
-	status := fiber.StatusOK
-
-	if err != nil {
-		return c.Status(status).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-
-	defer resp.Body.Close()
+	status := http.StatusOK
 
 	return c.Status(status).JSON(fiber.Map{
-		"message": message,
+		"message": "Hello World",
 	})
 }
 
-// @Summary Set user data for messages
-// @Description Endpoint for setting user data
-// @Tags /chat/user
-// @Produce json
-// @Success 200 {object} string
-// @Failure 400 {object} string
-// @Failure 500 {object} string
-// @Router /api/chat/user [post]
+// @Summary                     Set user data for messages
+// @Description                 Endpoint for setting user data
+// @Tags                        User
+// @Produce                     json
+// @Success                     200  {object}  response_message
+// @Failure                     400  {object}  response_message
+// @Failure                     500  {object}  response_message
+// @Router                      /chat/user [post]
+// @Security JWT
 func (h *Handler) CreateUserData(c *fiber.Ctx) error {
 	claims := c.Locals("claims")
 	message, status, err := h.Service.CreateUserData(claims.(*auth.Token).UID)
@@ -83,14 +71,15 @@ func (h *Handler) CreateUserData(c *fiber.Ctx) error {
 	})
 }
 
-// @Summary Set group for messages
-// @Description Endpoint for setting group to store messages
-// @Tags /chat/group
-// @Produce json
-// @Success 200 {object} string
-// @Failure 400 {object} string
-// @Failure 500 {object} string
-// @Router /api/chat/group [post]
+// @Summary      Set group for messages
+// @Description  Endpoint for setting group to store messages
+// @Tags         Group
+// @Produce      json
+// @Success      200  {object}  response_message
+// @Failure      400  {object}  response_message
+// @Failure      500  {object}  response_message
+// @Router       /chat/group [post]
+// @Security JWT
 func (h *Handler) CreateGroup(c *fiber.Ctx) error {
 	claims := c.Locals("claims")
 	message, status, err := h.Service.CreateGroup(claims.(*auth.Token).UID)
@@ -106,14 +95,17 @@ func (h *Handler) CreateGroup(c *fiber.Ctx) error {
 	})
 }
 
-// @Summary Add message according to group
-// @Description Endpoint for sending messages according to group
-// @Tags /chat/message
-// @Produce json
-// @Success 200 {object} string
-// @Failure 400 {object} string
-// @Failure 500 {object} string
-// @Router /api/chat/message [post]
+// @Summary      Add message according to group
+// @Description  Endpoint for sending messages according to group
+// @Tags         Message
+// @Produce      json
+// @Accept       json
+// @Param        tag  body      Text_message  true  "Text tag"
+// @Success      200  {object}  Text_message
+// @Failure      400  {object}  response_message
+// @Failure      500  {object}  response_message
+// @Router       /chat/message [post]
+// @Security JWT
 func (h *Handler) CreateMessage(c *fiber.Ctx) error {
 	claims := c.Locals("claims")
 
@@ -133,7 +125,16 @@ func (h *Handler) CreateMessage(c *fiber.Ctx) error {
 	}
 
 	// bot message
-	payload, status, err = h.Service.ProcessedML(payload.Text)
+	ml_server := os.Getenv("ML_SERVER_URL")
+
+	// determined which response
+	switch payload.Tag {
+	case "restaurant_recommendation":
+		ml_server = ml_server + "/resto-recommendation"
+	case "hotel_recommendation":
+		ml_server = ml_server + "/hotel-recommendation"
+	}
+	payload, status, err = h.Service.ProcessedML(payload.Text, ml_server)
 
 	message, status, err = h.Service.CreateMessageBot(groupId, payload.Text)
 

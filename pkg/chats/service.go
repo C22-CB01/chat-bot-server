@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -14,12 +13,11 @@ import (
 )
 
 type Service interface {
-	HelloWorld() (message string, status int, err error)
 	CreateUserData(uid string) (message string, status int, err error)
 	CreateGroup(uid string) (message string, status int, err error)
 	CreateMessageUser(uid string, text string) (message string, status int, err error, groupId string)
 	CreateMessageBot(groupUID string, text string) (message string, status int, err error)
-	ProcessedML(text string) (response Text_message, status int, err error)
+	ProcessedML(text string, ml_server string) (response Text_message, status int, err error)
 }
 
 type service struct {
@@ -55,13 +53,6 @@ func NewService(firebase_app *firebase.App, fire_auth *auth.Client, firestore *f
 	}
 
 	return svc
-}
-
-func (s *service) HelloWorld() (message string, status int, err error) {
-	message = "Hello World"
-	status = http.StatusOK
-	err = nil
-	return
 }
 
 func (s *service) CreateUserData(uid string) (message string, status int, err error) {
@@ -174,9 +165,8 @@ func (s *service) CreateMessageBot(groupUID string, text string) (message string
 	return
 }
 
-func (s *service) ProcessedML(text string) (ml_resp Text_message, status int, err error) {
+func (s *service) ProcessedML(text string, ml_server string) (ml_resp Text_message, status int, err error) {
 	status = http.StatusOK
-	ml_server := os.Getenv("ML_SERVER_URL")
 	post_body, _ := json.Marshal(map[string]string{
 		"text": text,
 	})
