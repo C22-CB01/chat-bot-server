@@ -10,14 +10,14 @@ import (
 	"gitlab.com/c22-cb01/chat-bot-server/docs"
 	"go.uber.org/zap"
 
-	fiberSwagger "github.com/swaggo/fiber-swagger"
+	fiberSwagger "github.com/gofiber/swagger"
 )
 
 type Server struct {
-	Router      *fiber.App
-	FirebaseApp *firebase.App
-    FirebaseAuth *auth.Client
-	Firestore   *firestore.Client
+	Router       *fiber.App
+	FirebaseApp  *firebase.App
+	FirebaseAuth *auth.Client
+	Firestore    *firestore.Client
 }
 
 func MakeServer(firebase_app *firebase.App, fire_auth *auth.Client, fire_store *firestore.Client) Server {
@@ -45,10 +45,10 @@ func (s *Server) RunServer() {
 func (s *Server) SetupSwagger() {
 
 	docs.SwaggerInfo.Title = "Swagger API"
-	docs.SwaggerInfo.Description = "Chat-bot server"
+	docs.SwaggerInfo.Description = "A server responsible for delivering messages to the ML API"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = os.Getenv("SWAGGER_HOST")
 	docs.SwaggerInfo.Schemes = []string{"http"}
 
-	s.Router.Get("/swagger/*", fiberSwagger.WrapHandler)
+	s.Router.Get("/docs/*", fiberSwagger.HandlerDefault)
 }

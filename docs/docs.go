@@ -16,127 +16,190 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/chat": {
-            "get": {
+        "/": {
+            "post": {
                 "description": "Endpoint for testing by returning Hello World",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "/chat"
+                    "Test"
                 ],
-                "summary": "Testing Endpoint",
+                "summary": "Testing Server",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "400": {
-                        "description": ""
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/chat.response_message"
+                        }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/chat.response_message"
+                        }
                     }
                 }
             }
         },
-        "/api/chat/group": {
+        "/chat/group": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Endpoint for setting group to store messages",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "/chat/group"
+                    "Group"
                 ],
                 "summary": "Set group for messages",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     }
                 }
             }
         },
-        "/api/chat/message": {
+        "/chat/message": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Endpoint for sending messages according to group",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "/chat/message"
+                    "Message"
                 ],
                 "summary": "Add message according to group",
+                "parameters": [
+                    {
+                        "description": "Text tag",
+                        "name": "tag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/chat.Text_message"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.Text_message"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     }
                 }
             }
         },
-        "/api/chat/user": {
+        "/chat/user": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Endpoint for setting user data",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "/chat/user"
+                    "User"
                 ],
                 "summary": "Set user data for messages",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/chat.response_message"
                         }
                     }
                 }
             }
+        }
+    },
+    "definitions": {
+        "chat.Text_message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "chat.response_message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -145,7 +208,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api/",
 	Schemes:          []string{},
 	Title:            "",
 	Description:      "",

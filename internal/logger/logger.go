@@ -68,7 +68,7 @@ func SetLogger() {
 
 func MiddleWare() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		if strings.HasPrefix(c.Path(), "/swagger") {
+		if strings.HasPrefix(c.Path(), "/docs") {
 			return c.Next()
 		}
 
